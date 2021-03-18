@@ -8,8 +8,8 @@ export class RestaurantResolver {
   constructor(private readonly restaurantService: RestaurantService) {}
 
   @Query((returns) => [Restaurant])
-  restaurants(): Restaurant[] {
-    return [];
+  restaurants(): Promise<Restaurant[]> {
+    return this.restaurantService.getAll();
   }
   @Mutation((returns) => Boolean)
   createRestaurant(@Args() createRestaurantDto: CreateRestaurantDto): boolean {
