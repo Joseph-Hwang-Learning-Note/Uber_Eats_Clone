@@ -1,6 +1,0 @@
-{
-    "material-icon-theme.files.associations": {
-        "*.ts": "typescript",
-        "fileName.ts": "nest"
-    }
-}

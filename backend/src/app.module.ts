@@ -1,11 +1,18 @@
-import { Module } from '@nestjs/common';
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  RequestMethod,
+} from '@nestjs/common';
 import * as Joi from 'joi';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
-import { CommonModule } from './common/common.module';
-import { User } from './users/entities/user.entity';
+import { Users } from './users/entities/user.entity';
+import { JwtModule } from './jwt/jwt.module';
+import { JwtMiddleware } from './jwt/jwt.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,10 +27,12 @@ import { User } from './users/entities/user.entity';
         DB_USERNAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
+        SECRET_KEY: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
+      context: ({ req }) => ({ user: req['user'] }),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -34,12 +43,22 @@ import { User } from './users/entities/user.entity';
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: true,
-      entities: [User],
+      entities: [Users],
+    }),
+    JwtModule.forRoot({
+      privateKey: process.env.SECRET_KEY,
     }),
     UsersModule,
-    CommonModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.POST,
+    });
+  }
+}
