@@ -1,6 +1,6 @@
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { Users } from '../entities/user.entity';
+import { Users } from '@users/entities/user.entity';
 
 @InputType()
 export class LoginInput extends PickType(Users, ['email', 'password']) {}

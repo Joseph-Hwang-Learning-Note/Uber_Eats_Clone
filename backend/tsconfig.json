@@ -10,6 +10,14 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "@users/*": ["./src/users/*"],
+      "@restaurants/*": ["./src/restaurants/*"],
+      "@auth/*": ["./src/auth/*"],
+      "@jwt/*": ["./src/jwt/*"],
+      "@common/*": ["./src/common/*"],
+      "@src/*": ["./src/*"],
+    }
   }
 }
