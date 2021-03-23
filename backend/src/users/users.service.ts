@@ -7,8 +7,10 @@ import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
 // import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@jwt/jwt.service';
-import { EditProfileInput } from './dtos/edit-profile.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { Verification } from './entities/verification.entity';
+import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
+import { VerifyEmailOutput, VerifyEmailInput } from './dtos/verify-email.dto';
 
 @Injectable()
 export class UsersService {
@@ -76,26 +78,37 @@ export class UsersService {
     }
   }
 
-  async findById(id: number): Promise<Users> {
-    return this.users.findOne({ id });
+  async findById({ userId }: UserProfileInput): Promise<UserProfileOutput> {
+    try {
+      const user = await this.users.findOne(userId);
+      if (!user) throw Error();
+      return { ok: true, user };
+    } catch (error) {
+      return { ok: false, error: 'User Not Found' };
+    }
   }
 
   async editProfile(
     userId: number,
     { email, password }: EditProfileInput,
-  ): Promise<Users> {
+  ): Promise<EditProfileOutput> {
     // Don't Spread in update
-    const user = await this.users.findOne(userId);
-    if (email) {
-      user.email = email;
-      user.verified = false;
-      await this.verification.save(this.verification.create({ user }));
+    try {
+      const user = await this.users.findOne(userId);
+      if (email) {
+        user.email = email;
+        user.verified = false;
+        await this.verification.save(this.verification.create({ user }));
+      }
+      if (password) user.password = password;
+      this.users.save(user);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error };
     }
-    if (password) user.password = password;
-    return this.users.save(user);
   }
 
-  async verifyEmail(code: string): Promise<boolean> {
+  async verifyEmail({ code }: VerifyEmailInput): Promise<VerifyEmailOutput> {
     try {
       const verification = await this.verification.findOne(
         { code },
@@ -104,13 +117,14 @@ export class UsersService {
       );
       if (verification) {
         verification.user.verified = true;
-        this.users.save(verification.user);
-        return true;
+        await this.users.save(verification.user);
+        await this.verification.delete(verification.id);
+        return { ok: true };
       }
       throw new Error();
     } catch (error) {
       console.error(error);
-      return false;
+      return { ok: false, error };
     }
   }
 }
