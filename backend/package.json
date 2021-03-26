@@ -98,7 +98,11 @@
     "coveragePathIgnorePatterns": [
       "node_modules",
       ".entity.ts",
-      ".constants.ts"
+      ".constants.ts",
+      ".dto.ts",
+      ".resolver.ts",
+      ".module.ts",
+      "main.ts"
     ]
   }
 }
