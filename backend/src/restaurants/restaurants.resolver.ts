@@ -1,5 +1,5 @@
 import { AuthUser } from '@auth/auth-user.decorator';
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Args, Mutation } from '@nestjs/graphql';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
