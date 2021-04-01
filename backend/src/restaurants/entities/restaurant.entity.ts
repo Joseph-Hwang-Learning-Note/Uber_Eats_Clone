@@ -1,9 +1,10 @@
 import { CoreEntity } from '@common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsOptional, IsString } from 'class-validator';
-import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
+import { IsOptional, IsString, Length } from 'class-validator';
+import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Category } from '@restaurants/entities/category.entity';
 import { Users } from '@users/entities/user.entity';
+import { Dish } from './dish.entity';
 
 @InputType('RestaurantInputType', { isAbstract: true })
 @ObjectType()
@@ -12,6 +13,7 @@ export class Restaurant extends CoreEntity {
   @Field((is) => String)
   @Column()
   @IsString()
+  @Length(1, 50)
   name: string;
 
   @Field((is) => String)
@@ -26,16 +28,22 @@ export class Restaurant extends CoreEntity {
   address?: string;
 
   @Field((is) => Category, { nullable: true })
-  @ManyToOne((is) => Category, (category) => category.restaurants, {
+  @ManyToOne((type) => Category, (category) => category.restaurants, {
     nullable: true,
     onDelete: 'SET NULL',
   })
   category: Category;
 
   @Field((is) => Users)
-  @ManyToOne((is) => Users, (user) => user.restaurants, { onDelete: 'CASCADE' })
+  @ManyToOne((type) => Users, (user) => user.restaurants, {
+    onDelete: 'CASCADE',
+  })
   owner: Users;
 
   @RelationId((restaurant: Restaurant) => restaurant.owner)
   ownerId: number;
+
+  @Field((is) => [Dish])
+  @OneToMany((type) => Dish, (dish) => dish.restaurant)
+  menu: Dish[];
 }
