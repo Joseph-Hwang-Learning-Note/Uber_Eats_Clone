@@ -1,58 +1,68 @@
-import { CoreEntity } from "@common/entities/core.entity";
-import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { IsNumber, IsString, Length } from "class-validator";
-import { Column, Entity, ManyToOne, RelationId } from "typeorm";
-import { Restaurant } from "./restaurant.entity";
+import { CoreEntity } from '@common/entities/core.entity';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { IsNumber, IsString, Length } from 'class-validator';
+import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
+import { Restaurant } from './restaurant.entity';
 
-
-@InputType('DishOptionInputType', {isAbstract: true})
+@InputType('DishChoiceInputType', { isAbstract: true })
 @ObjectType()
-class DishOption {
-    @Field(is => String)
-    name: string;
+class DishChoice {
+  @Field((is) => String)
+  name: string;
 
-    @Field(is => String, {nullable: true})
-    choices?: string[];
-
-    @Field(is => Int)
-    extra?: number;
+  @Field((is) => Int, { nullable: true })
+  extra?: number;
 }
 
+@InputType('DishOptionInputType', { isAbstract: true })
+@ObjectType()
+class DishOption {
+  @Field((is) => String)
+  name: string;
 
-@InputType('DishInputType', {isAbstract: true})
+  @Field((is) => [DishChoice], { nullable: true })
+  choices?: DishChoice[];
+
+  @Field((is) => Int, { nullable: true })
+  extra?: number;
+}
+
+@InputType('DishInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class Dish extends CoreEntity {
-    @Field(is => String)
-    @Column()
-    @IsString()
-    @Length(1,30)
-    name: string;
+  @Field((is) => String)
+  @Column()
+  @IsString()
+  @Length(1, 30)
+  name: string;
 
-    @Field(is => Int)
-    @Column()
-    @IsNumber()
-    price: number;
+  @Field((is) => Int)
+  @Column()
+  @IsNumber()
+  price: number;
 
-    @Field(is => String, {nullable: true})
-    @Column({nullable: true})
-    @IsString()
-    photo: string;
+  @Field((is) => String, { nullable: true })
+  @Column({ nullable: true })
+  @IsString()
+  photo: string;
 
-    @Field(is => String)
-    @Column()
-    @IsString()
-    @Length(5, 200)
-    description: string;
+  @Field((is) => String)
+  @Column()
+  @IsString()
+  @Length(5, 200)
+  description: string;
 
-    @Field(is => Restaurant, {nullable: true})
-    @ManyToOne((type) => Restaurant, restaurant => restaurant.menu, {onDelete:'CASCADE'})
-    restaurant: Restaurant;
+  @Field((is) => Restaurant, { nullable: true })
+  @ManyToOne((type) => Restaurant, (restaurant) => restaurant.menu, {
+    onDelete: 'CASCADE',
+  })
+  restaurant: Restaurant;
 
-    @RelationId((dish: Dish) => dish.restaurant)
-    restaurantId: number;
+  @RelationId((dish: Dish) => dish.restaurant)
+  restaurantId: number;
 
-    @Field(is => DishOption, {nullable:true})
-    @Column({type:'json', nullable:true})
-    options: DishOption[]
+  @Field((is) => DishOption, { nullable: true })
+  @Column({ type: 'json', nullable: true })
+  options: DishOption[];
 }
