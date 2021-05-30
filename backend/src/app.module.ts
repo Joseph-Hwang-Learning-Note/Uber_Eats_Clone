@@ -22,6 +22,9 @@ import { Dish } from '@restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
+import { CommonModule } from '@common/common.module';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -37,11 +40,21 @@ import { OrderItem } from './orders/entities/order-item.entity';
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         SECRET_KEY: Joi.string().required(),
+        MAILGUN_API_KEY: Joi.string().required(),
+        EMAIL_DOMAIN: Joi.string().required(),
+        FROM_EMAIL: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({
+      installSubscriptionHandlers: true,
       autoSchemaFile: true,
-      context: ({ req }) => ({ user: req['user'] }),
+      context: ({ req, connection }) => {
+        // Request is for http, connection for ws
+        const TOKEN_KEY = 'x-jwt';
+        return {
+          token: req ? req.headers[TOKEN_KEY] : connection.context[TOKEN_KEY],
+        };
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -61,6 +74,7 @@ import { OrderItem } from './orders/entities/order-item.entity';
         Dish,
         Order,
         OrderItem,
+        Payment,
       ],
     }),
     JwtModule.forRoot({
@@ -75,6 +89,8 @@ import { OrderItem } from './orders/entities/order-item.entity';
     RestaurantsModule,
     AuthModule,
     OrdersModule,
+    CommonModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],
