@@ -11,6 +11,7 @@
     "@types/node": "^12.20.13",
     "@types/react": "^17.0.8",
     "@types/react-dom": "^17.0.5",
+    "@types/react-helmet": "^6.1.1",
     "@types/react-router-dom": "^5.1.7",
     "apollo": "^2.33.4",
     "autoprefixer": "^10.2.6",
@@ -18,6 +19,8 @@
     "postcss": "^8.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-helmet": "^6.1.0",
+    "react-helmet-async": "^1.0.9",
     "react-hook-form": "^7.7.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
@@ -27,11 +30,11 @@
   },
   "scripts": {
     "tailwind:build": "tailwind build ./src/tailwind.scss -o ./src/styles.css",
-    "start": "npm run tailwind:build & react-scripts start",
+    "start": "npm run apollo:codegen & npm run tailwind:build & react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "apollo:codegen": "apollo client:codegen src/api --target=typescript --outputFlat"
+    "apollo:codegen": "rm -rf src/api && apollo client:codegen src/api --target=typescript --outputFlat"
   },
   "eslintConfig": {
     "extends": [

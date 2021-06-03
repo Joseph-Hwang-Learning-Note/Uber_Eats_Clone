@@ -3,20 +3,23 @@ import gql from 'graphql-tag';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { LoginMutation, LoginMutationVariables } from 'src/api/LoginMutation';
+import Logo from 'src/img/logo.svg';
 import FormError from 'src/components/form-error';
+import Button from 'src/components/button';
+import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { authToken, isLoggedInVar } from 'src/apollo';
+import { LOCALSTORAGE_TOKEN } from 'src/constants';
 
 const LOGIN_MUTATION = gql`
-  mutation LoginMutation($email: String!, $password:String!) {
-    login(input: {
-      email: $email,
-      password: $password
-    }) {
+  mutation LoginMutation($loginInput: LoginInput!) {
+    login(input: $loginInput) {
       ok,
       token,
       error
     }
   }
-`
+`;
 
 interface LoginForm {
     email?: string;
@@ -24,49 +27,91 @@ interface LoginForm {
 }
 
 const Login: React.FC = () => {
-  const { register, getValues, handleSubmit, formState: { errors } } = useForm<LoginForm>();
-  const [ loginMutation, { loading, error, data } ] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN_MUTATION)
+  const { 
+    register, 
+    getValues, 
+    formState: { 
+      errors, 
+      isValid 
+    } 
+  } = useForm<LoginForm>({
+    mode: 'onChange'
+  });
+  const onCompleted = (data: LoginMutation) => {
+    const { login: { ok, token } } = data;
+    if (ok && token) {
+      localStorage.setItem(LOCALSTORAGE_TOKEN, token);
+      authToken(token);
+      isLoggedInVar(true);
+    }
+  };
+  const [ loginMutation, { data: loginMutationResult, loading } ] = useMutation<
+    LoginMutation, 
+    LoginMutationVariables
+  >(LOGIN_MUTATION, {
+    onCompleted,
+  });
 
   const onSubmit = () => {
-    const { email, password } = getValues();
-    if ( email && password ) {
+    if (!loading) {
+      let { email, password } = getValues();
+      email = email || '';
+      password = password || '';
       loginMutation({
         variables: {
-          email, 
-          password,
+          loginInput: {
+            email,
+            password
+          }
         }
-      })
+      });
     }
-  }
+  };
     
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800">
-      <div className="bg-white w-full max-w-lg pt-8 pb-7 rounded-lg text-center">
-        <h3 className="font-bold text-3xl text-gray-800"></h3>
-        <form className="grid gap-3 mt-5 px-5" onSubmit={onSubmit}>
+    <div className="h-screen flex items-center flex-col mt-10 lg:mt-28">
+      <Helmet>
+        <title>Login | Nuber Eats</title>
+      </Helmet>
+      <div className="w-full max-w-screen-sm flex flex-col items-center px-5">
+        <img src={Logo} className="w-52 mb-5" />
+        <form className="grid gap-3 my-5 w-full" onSubmit={onSubmit}>
+          <h4 className="text-left w-full text-3xl font-medium">Welcome back</h4>
           <input 
-            {...register('email' , { required: 'Email is required' })}
+            {...register('email' , { 
+              required: 'Email is required', 
+              minLength: 1,
+              // eslint-disable-next-line
+              pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            })}
             name="email"
             type="email"
             placeholder="Email" 
             className="input"
           />
           { errors.email?.message && <FormError errorMessage={errors.email?.message} /> }
+          { errors.email?.type && <FormError errorMessage="Please enter a valid email" /> }
           <input 
-            {...register('password' , { required: 'Password is required' })}
+            {...register('password' , { required: 'Password is required', minLength: 1 })}
             name="password"
             type="password"
             placeholder="Password" 
             className="input"
           />
           { errors.password?.message && <FormError errorMessage={errors.password?.message} /> }
-          <button className="btn mt-3">
-              Log In
-          </button>
+          <Button 
+            canClick={isValid}
+            loading={loading}
+            actionText="Log In"
+          />
+          { loginMutationResult?.login.error && <FormError errorMessage={loginMutationResult.login.error} /> }
         </form>
+        <div>
+          New to Nuber?{' '} <Link to="/create-account" className="text-lime-600 hover:underline">Create an Account</Link>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Login;
