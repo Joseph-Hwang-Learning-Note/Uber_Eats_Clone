@@ -1,11 +1,11 @@
 import React from 'react';
 
-function CreateAccount(): JSX.Element {
+const CreateAccount: React.FC = () => {
   return (
     <div>
             
     </div>
   );
-}
+};
 
 export default CreateAccount;

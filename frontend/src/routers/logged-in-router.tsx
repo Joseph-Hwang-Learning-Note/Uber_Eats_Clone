@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 
-function LoggedInRouter() {
-    return (
-        <div>
+const LoggedInRouter: React.FC = () => {
+  return (
+    <div>
             
-        </div>
-    )
-}
+    </div>
+  );
+};
 
-export default LoggedInRouter
+export default LoggedInRouter;

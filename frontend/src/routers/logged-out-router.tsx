@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import CreateAccount from 'src/pages/create-account';
 import Login from 'src/pages/login';
 
-function LoggedOutRouter(): JSX.Element {
+const LoggedOutRouter: React.FC = () => {
   return (
     <Router>
       <Switch>
@@ -16,6 +16,6 @@ function LoggedOutRouter(): JSX.Element {
       </Switch>
     </Router>
   );
-}
+};
 
 export default LoggedOutRouter;

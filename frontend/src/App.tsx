@@ -5,10 +5,10 @@ import LoggedInRouter from './routers/logged-in-router';
 import LoggedOutRouter from './routers/logged-out-router';
 import './styles.css';
 
-function App(): JSX.Element {
+const App: React.FC = () => {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
 
   return isLoggedIn ? <LoggedInRouter /> : <LoggedOutRouter />;
-}
+};
 
 export default App;

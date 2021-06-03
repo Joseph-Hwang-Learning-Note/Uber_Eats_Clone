@@ -36,6 +36,7 @@ module.exports = {
     'semi': [
       'warn',
       'always'
-    ]
+    ],
+    'react/prop-types': 0
   }
 };
