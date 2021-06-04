@@ -5,6 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { ApolloProvider } from '@apollo/client';
 import client from './apollo';
 import { HelmetProvider } from 'react-helmet-async';
+import './styles.css';
 
 
 ReactDOM.render(

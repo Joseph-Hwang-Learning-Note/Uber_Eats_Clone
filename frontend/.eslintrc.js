@@ -38,6 +38,12 @@ module.exports = {
       'warn',
       'always'
     ],
-    'react/prop-types': 0
+    'react/prop-types': 0,
+    '@typescript-eslint/no-unused-vars': [
+      'warn', {
+        'varsIgnorePattern': '^_+',
+        'argsIgnorePattern': '^_+',
+      }
+    ]
   }
 };

@@ -1,6 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import NotFound from 'src/pages/404';
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import CreateAccount from 'src/pages/create-account';
 import Login from 'src/pages/login';
 
@@ -14,9 +13,7 @@ const LoggedOutRouter: React.FC = () => {
         <Route path='/login' exact>
           <Login />
         </Route>
-        <Route>
-          <NotFound />
-        </Route>
+        <Redirect to='/login' />
       </Switch>
     </Router>
   );

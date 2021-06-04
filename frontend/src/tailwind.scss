@@ -1,6 +1,29 @@
 @tailwind base;
 @tailwind components;
 
-@import 'styles/main';
+.row-between {
+    @apply flex justify-between items-center;
+}
+
+.col-start {
+    @apply flex flex-col justify-start items-center;
+}
+
+.row-center {
+    @apply flex justify-center items-center;
+}
+
+.col-center {
+    @apply flex flex-col justify-center items-center;
+}
+.input {
+    @apply p-3 border border-gray-200 text-lg font-light focus:outline-none focus:border-gray-500 transition-colors w-full;
+}
+
+
+
+
+
+
 
 @tailwind utilities;

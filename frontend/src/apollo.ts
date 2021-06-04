@@ -13,8 +13,10 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   return {
-    ...headers,
-    'x-jwt': authToken() || ''
+    headers: {
+      ...headers,
+      'x-jwt': authToken() || ''
+    }
   };
 });
 

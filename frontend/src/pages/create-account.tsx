@@ -2,13 +2,14 @@ import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import Logo from 'src/img/logo.svg';
 import FormError from 'src/components/form-error';
 import Button from 'src/components/button';
 import { Link, useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { UserRole } from 'src/api/globalTypes';
 import { createAccountMutation, createAccountMutationVariables } from 'src/api/createAccountMutation';
+import Logo from 'src/components/logo';
+import { EMAIL_VALIDATOR } from 'src/constants';
 
 const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
@@ -32,7 +33,8 @@ const CreateAccount: React.FC = () => {
     formState: { 
       errors, 
       isValid 
-    } 
+    },
+    handleSubmit
   } = useForm<CreateAccountForm>({
     mode: 'onChange',
     defaultValues: {
@@ -41,9 +43,10 @@ const CreateAccount: React.FC = () => {
   });
 
   const history = useHistory();
-  const onCompleted = (data: createAccountMutation) => {
+  const onCompleted = (data: createAccountMutation): void => {
     const { createAccount: { ok } } = data;
     if (ok) {
+      alert('Account Created! Log in now!');
       history.push('/login');
     }
   };
@@ -55,19 +58,20 @@ const CreateAccount: React.FC = () => {
     onCompleted
   });
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     if (!loading) {
       // eslint-disable-next-line
-      let { email, password, role } = getValues();
-      email = email || '';
-      password = password || '';
-      createAccountMutation({
-        variables: {
-          createAccountInput: {
-            email, password, role
+      const { email, password, role } = getValues();
+
+      if ( email && password ) {
+        createAccountMutation({
+          variables: {
+            createAccountInput: {
+              email, password, role
+            }
           }
-        }
-      });
+        });
+      }
     }
   };
     
@@ -77,15 +81,14 @@ const CreateAccount: React.FC = () => {
         <title>Create Account | Nuber Eats</title>
       </Helmet>
       <div className="w-full max-w-screen-sm flex flex-col items-center px-5">
-        <img src={Logo} className="w-52 mb-5" />
-        <form className="grid gap-3 my-5 w-full" onSubmit={onSubmit}>
+        <Logo className="w-52 mb-5" />
+        <form className="grid gap-3 my-5 w-full" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="text-left w-full text-3xl font-medium">Let&apos;s get started!</h4>
           <input 
             {...register('email' , { 
               required: 'Email is required', 
               minLength: 1, 
-              // eslint-disable-next-line
-              pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+              pattern: EMAIL_VALIDATOR
             })}
             name="email"
             type="email"

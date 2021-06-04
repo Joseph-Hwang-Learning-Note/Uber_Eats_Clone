@@ -1,24 +1,14 @@
-import { useQuery } from '@apollo/client';
-import gql from 'graphql-tag';
 import React from 'react';
-import { meQuery } from 'src/api/meQuery';
-import { BrowserRouter as Router, Redirect, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import ClientRoutes from './client-router';
+import Header from 'src/components/header';
+import NotFound from 'src/pages/404';
+import { useMe } from 'src/hooks/useMe';
 
-const ME_QUERY = gql`
-  query meQuery {
-    me {
-      id,
-      email,
-      role,
-      verified
-    }
-  }
-`;
 
 const LoggedInRouter: React.FC = () => {
 
-  const { data, loading, error } = useQuery<meQuery>(ME_QUERY);
+  const { data, loading, error } = useMe();
 
   if (!data || loading || error) {
     return (
@@ -30,9 +20,12 @@ const LoggedInRouter: React.FC = () => {
 
   return (
     <Router>
+      <Header />
       <Switch>
         { data.me.role === 'Client' && ClientRoutes }
-        <Redirect to="/" />
+        <Route>
+          <NotFound />
+        </Route>
       </Switch>
     </Router>
   );

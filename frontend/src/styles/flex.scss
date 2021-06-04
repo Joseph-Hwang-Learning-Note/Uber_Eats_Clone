@@ -1,0 +1,16 @@
+
+.row-between {
+    @apply flex justify-between items-center;
+}
+
+.col-start {
+    @apply flex flex-col justify-start items-center;
+}
+
+.row-center {
+    @apply flex justify-center items-center;
+}
+
+.col-center {
+    @apply flex flex-col justify-center items-center;
+}
